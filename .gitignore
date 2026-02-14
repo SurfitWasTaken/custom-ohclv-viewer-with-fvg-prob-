@@ -1,0 +1,29 @@
+# Virtual environment
+venv/
+.venv/
+env/
+__pycache__/
+*.pyc
+
+# OANDA Credentials
+.env
+
+# Large data files
+data/raw/
+data/processed/
+*.csv
+*.json
+*.log
+
+# Visualizations
+data/visualizations/
+*.png
+
+# IDE settings
+.vscode/
+.idea/
+.DS_Store
+
+# Brain/Artifacts (system generated)
+.gemini/
+brain/

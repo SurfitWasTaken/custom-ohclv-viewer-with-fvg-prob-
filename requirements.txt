@@ -1,0 +1,23 @@
+# FVG Probability Modeling - Phase -1 Dependencies
+
+# OANDA API
+oandapyV20==0.7.2
+requests>=2.31.0
+
+# Data handling
+pandas>=2.2.0
+numpy>=1.26.0
+
+# Environment variables
+python-dotenv>=1.0.0
+
+# Data validation
+scipy>=1.12.0
+
+# Visualization
+matplotlib>=3.8.0
+mplfinance>=0.12.10
+
+# Optional: Database support (for future phases)
+# psycopg2-binary==2.9.9
+# sqlalchemy==2.0.23
