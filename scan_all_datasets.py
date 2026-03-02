@@ -10,7 +10,8 @@ Processes:
 """
 
 import sys
-sys.path.append('/Users/kallif/Documents/Dope/Quant/fvg-probability/src')
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
 
 import pandas as pd
 import json

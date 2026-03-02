@@ -1,0 +1,13 @@
+.git/
+.gitignore
+__pycache__/
+*.pyc
+*.pyo
+venv/
+.env
+data/visualizations/
+data/processed/
+tests/
+*.md
+*.log
+.agents/

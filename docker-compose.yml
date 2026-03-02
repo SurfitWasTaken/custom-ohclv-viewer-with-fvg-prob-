@@ -1,0 +1,22 @@
+version: "3.9"
+
+services:
+  fvg-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fvg-probability-api
+    ports:
+      - "5000:5000"
+    volumes:
+      # Persist prediction logs across restarts
+      - ./models/phase5:/app/models/phase5
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c",
+             "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3

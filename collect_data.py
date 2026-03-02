@@ -4,7 +4,8 @@ Collects 3 years of historical data for all required instruments and timeframes
 """
 
 import sys
-sys.path.append('/Users/kallif/Documents/Dope/Quant/fvg-probability/src')
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
 
 from oanda_collector import OANDADataCollector
 from data_validator import DataValidator

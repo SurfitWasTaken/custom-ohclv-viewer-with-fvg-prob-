@@ -4,25 +4,43 @@ venv/
 env/
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.coverage
+htmlcov/
 
-# OANDA Credentials
+# OANDA Credentials / Secrets
 .env
+.env.*
+!.env.example
 
 # Large data files
 data/raw/
 data/processed/
 *.csv
 *.json
+*.jsonl
 *.log
+*.pkl
 
 # Visualizations
 data/visualizations/
 *.png
+*.jpg
+*.jpeg
+*.gif
+*.html
 
 # IDE settings
 .vscode/
 .idea/
+*.swp
+*.swo
+
+# OS specific
 .DS_Store
+Thumbs.db
 
 # Brain/Artifacts (system generated)
 .gemini/

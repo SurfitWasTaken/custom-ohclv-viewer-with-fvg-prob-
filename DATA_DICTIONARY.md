@@ -144,7 +144,7 @@ No invalid candles detected.
 
 ### Collection Summary
 
-See [collection_summary.json](file:///Users/kallif/Documents/Dope/Quant/fvg-probability/data/raw/collection_summary.json) for:
+See [collection_summary.json](data/raw/collection_summary.json) for:
 - Exact candle counts per dataset
 - Validation reports
 - Issue details
@@ -167,5 +167,5 @@ Data versioning not yet implemented. Current data represents:
 ## References
 
 - OANDA v20 API Documentation: https://developer.oanda.com/rest-live-v20/introduction/
-- Workflow Document: [fvg_probability_workflow.md](file:///Users/kallif/Documents/Dope/Quant/fvg-probability/fvg_probability_workflow.md)
-- Deviations Log: [deviations_log.md](file:///Users/kallif/.gemini/antigravity/brain/c8ebe8c1-12e4-4f0e-a43f-8846abf9720f/deviations_log.md)
+- Workflow Document: [fvg_probability_workflow.md](fvg_probability_workflow.md)
+- Deviations Log: [deviations_log.md](deviations_log.md)

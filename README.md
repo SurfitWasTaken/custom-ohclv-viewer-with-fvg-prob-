@@ -1,100 +1,76 @@
-# FVG Probability Modeling - Phase -1 Complete ✅
+# FVG Probability Modeling 📈
 
-## Quick Start
+A quantitative research project and production-ready toolset for predicting **Fair Value Gap (FVG)** fill probabilities using Survival Analysis and Machine Learning.
 
-### Activate Environment
+## 🚀 Core Functionality
+
+This project implements a complete pipeline to:
+1.  **Detect FVGs**: Identifies bullish (BISI) and bearish (SIBI) gaps across multiple timeframes.
+2.  **Model Probability**: Uses a **Survival Analysis** model (`survival_model.pkl`) to estimate the *probability of mitigation* over time (e.g., "95% chance of being filled within 100 candles").
+3.  **Real-time Prediction**: A V2 **Fill Predictor** that analyzes the competing "pull" between bullish and bearish gaps to establish market bias.
+
+## 📊 Key Research Findings
+
+*   **High Reversion Rate**: On higher timeframes (1H, 4H), over **93%** of detected FVGs are eventually touched or mitigated.
+*   **The "Pull" Effect**: Unmitigated gaps act as price magnets. A cluster of high-probability bearish gaps above price typically exerts a **Bullish Pull** (ICT logic), drawing price upward for mitigation.
+*   **Time Sensitivity**: Most FVGs are reached within the first **3-8 candles** of their formation.
+*   **Dataset**: Validated across ~113,000 candles from 4 major pairs (EURUSD, GBPUSD, USDJPY, AUDUSD) over a 3-5 year period.
+
+## 🖥️ Visual Dashboard
+
+The project includes a sleek, interactive dashboard for monitoring live or historical gaps.
+
+- **Candlestick Charts**: Real-time FVG detection and visualization.
+- **Probability Bars**: Dynamic display of fill probabilities across 2, 5, 10, 20, 50, and 100 candle horizons.
+- **Bias Indicators**: Automated labeling of `BULLISH PULL`, `BEARISH PULL`, or `COMPETING` biases based on active gaps.
+
+### Start the Dashboard
 ```bash
 source venv/bin/activate
+
+# Offline mode (uses local CSV data)
+python3 src/monitor_dashboard.py --port 5001 --offline
+
+# Live mode (requires OANDA API credentials)
+python3 src/monitor_dashboard.py --port 5001
 ```
 
-### View Collected Data
-```bash
-ls -lh data/raw/
-```
+## 🛠️ Project Structure
 
-### Load Data in Python
-```python
-import pandas as pd
-
-# Load EURUSD 1H data
-df = pd.read_csv('data/raw/EURUSD_1H_20210201_20240201.csv', 
-                 index_col='timestamp', parse_dates=True)
-print(df.head())
-```
-
-## Project Structure
-
-```
-fvg-probability/
-├── data/
-│   ├── raw/                    # 12 CSV files (4 pairs × 3 timeframes)
-│   └── processed/              # (empty - for Phase 0+)
+```text
+fvg-probability-v2/
 ├── src/
-│   ├── oanda_collector.py      # OANDA API data collector
-│   └── data_validator.py       # Data quality validation
-├── venv/                       # Python virtual environment
-├── collect_data.py             # Main data collection script
-├── requirements.txt            # Python dependencies
-├── DATA_DICTIONARY.md          # Data schema and documentation
-└── fvg_probability_workflow.md # Original workflow document
+│   ├── fill_predictor.py     # V2 Prediction engine (Survival Model)
+│   ├── monitor_dashboard.py  # Interactive visualization
+│   ├── fvg_detector.py       # Core gap identification logic
+│   └── oanda_collector.py     # Resilient data acquisition
+├── data/
+│   ├── raw/                  # ~113k candles across 12 datasets
+│   └── processed/            # FVG statistics and extracted features
+├── models/                   # Serialized survival models and metadata
+├── collect_data.py           # Bulk data collection script
+└── scan_all_datasets.py      # Statistical FVG batch scanner
 ```
 
-## Data Summary
+## 🔐 Security & Portability (GitHub Ready)
 
-**Collected**: 12 datasets (4 currency pairs × 3 timeframes)  
-**Total Candles**: ~113,000  
-**Date Range**: Feb 2021 - Jan 2024 (3 years intraday, 5 years daily)  
-**Quality**: All datasets validated ✅
+This repository has been sanitized for public use:
+- **Masked Credentials**: API account IDs are masked in all console outputs.
+- **Relative Paths**: All logic uses relative pathing, making the project portable across different OS/environments.
+- **Ignored Secrets**: `.env` and sensitive artifacts are excluded via `.gitignore`.
+- **Template**: See [.env.example](.env.example) to set up your own OANDA credentials.
 
-| Pair | 1H | 4H | Daily |
-|------|----|----|-------|
-| EURUSD | 18,712 | 4,681 | 1,299 |
-| GBPUSD | 18,711 | 4,681 | 1,303 |
-| USDJPY | 18,712 | 4,681 | 1,315 |
-| AUDUSD | 18,707 | 4,681 | 1,298 |
+## 📦 Installation
 
-## Next Steps
-
-✅ **Phase -1 Complete**: Data Acquisition  
-✅ **Phase 0 Complete**: FVG Identification & Validation
-
-Ready for **Phase 1: Feature Engineering**
-
-### Phase 0 Results
-
-**FVG Detection Summary**:
-- 19,840 FVGs detected across all datasets
-- 20.08% FVG rate (1 in 5 candles)
-- 100% reversion rate (all touched within 1 candle)
-- 50 sample visualizations generated
-
-**Key Finding**: High FVG frequency suggests current definition captures micro-gaps. Phase 1 will add filtering for meaningful gaps.
-
-See workflow document for Phase 1 details: [fvg_probability_workflow.md](fvg_probability_workflow.md#phase-1-feature-engineering-week-2)
-
-## Documentation
-
-- **[DATA_DICTIONARY.md](DATA_DICTIONARY.md)** - Data schema and field definitions
-- **[deviations_log.md](../.gemini/antigravity/brain/c8ebe8c1-12e4-4f0e-a43f-8846abf9720f/deviations_log.md)** - Workflow deviations and impact analysis
-- **[walkthrough.md](../.gemini/antigravity/brain/c8ebe8c1-12e4-4f0e-a43f-8846abf9720f/walkthrough.md)** - Complete Phase -1 walkthrough
-- **[collection_summary.json](data/raw/collection_summary.json)** - Detailed collection results
-
-## Key Deviations from Workflow
-
-✅ **Using OANDA API instead of MT5** - Better API, production-ready  
-✅ **CSV storage instead of TimescaleDB** - Simpler for development  
-✅ **Date-based chunking** - Handles OANDA's 5000 candle limit  
-
-**Impact on Future Phases**: None - all deviations are improvements or neutral
-
-## Dependencies
-
-```
-Python 3.13
-oandapyV20==0.7.2
-pandas>=2.2.0
-numpy>=1.26.0
-scipy>=1.12.0
+```bash
+git clone https://github.com/SurfitWasTaken/custom-ohclv-viewer-with-fvg-prob-.git
+cd fvg-probability-v2
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
 ```
 
-Install: `pip install -r requirements.txt`
+---
+*Disclaimer: This is a quantitative research tool, not financial advice.*
+*Authored by Kallif, Claude Opus 4.6 and Gemini 3 Flash*
+*Last updated: 2nd March 2026*

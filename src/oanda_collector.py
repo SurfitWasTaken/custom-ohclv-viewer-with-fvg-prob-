@@ -33,7 +33,7 @@ class OANDADataCollector:
         """
         # Load from environment if not provided
         if access_token is None:
-            load_dotenv('/Users/kallif/Documents/Dope/Quant/.env')
+            load_dotenv()
             access_token = os.getenv('OANDA_ACCESS_TOKEN')
             account_id = os.getenv('OANDA_ACCOUNT_ID')
         
@@ -46,7 +46,9 @@ class OANDADataCollector:
         self.client = API(access_token=access_token, environment=environment)
         
         print(f"OANDA API initialized: {environment} environment")
-        print(f"Account ID: {account_id}")
+        if account_id:
+            masked_id = f"{account_id[:3]}...{account_id[-3:]}"
+            print(f"Account ID: {masked_id}")
     
     def _oanda_instrument_name(self, symbol):
         """
