@@ -67,29 +67,38 @@ class OANDADataCollector:
         
         raise ValueError(f"Invalid symbol format: {symbol}")
     
+    # All OANDA-native granularities we support
+    GRANULARITY_MAP = {
+        'M1':  'M1',   '1M':  'M1',
+        'M5':  'M5',   '5M':  'M5',
+        'M15': 'M15',  '15M': 'M15',
+        'M30': 'M30',  '30M': 'M30',
+        'H1':  'H1',   '1H':  'H1',
+        'H2':  'H2',   '2H':  'H2',
+        'H4':  'H4',   '4H':  'H4',
+        'D':   'D',    '1D':  'D',
+        'W':   'W',    '1W':  'W',
+    }
+
+    # Max chunk sizes (in days) to stay under 5000-candle OANDA limit
+    _CHUNK_DAYS = {
+        'M1': 3, 'M5': 15, 'M15': 45, 'M30': 90,
+        'H1': 180, 'H2': 360, 'H4': 720,
+        'D': 4000, 'W': 4000,
+    }
+
     def _oanda_granularity(self, timeframe_str):
         """
         Map timeframe strings to OANDA granularity codes.
         
-        Parameters:
-        -----------
-        timeframe_str : str, '1H', '4H', '1D', '15M'
-        
-        Returns:
-        --------
-        str, OANDA granularity code
+        Supports: M1, M5, M15, M30, H1, H2, H4, D, W
+        (and aliases like 1M, 5M, 15M, 1H, 4H, 1D, 1W)
         """
-        granularity_map = {
-            '15M': 'M15',
-            '1H': 'H1',
-            '4H': 'H4',
-            '1D': 'D',
-        }
-        
-        granularity = granularity_map.get(timeframe_str)
+        granularity = self.GRANULARITY_MAP.get(timeframe_str.upper())
         if not granularity:
-            raise ValueError(f"Unsupported timeframe: {timeframe_str}")
-        
+            raise ValueError(
+                f"Unsupported timeframe: {timeframe_str}. "
+                f"Supported: {sorted(set(self.GRANULARITY_MAP.values()))}")
         return granularity
     
     def get_historical_data(self, symbol, timeframe_str, start_date, end_date):
@@ -122,17 +131,7 @@ class OANDADataCollector:
         print(f"Fetching {symbol} {timeframe_str} from {start_date} to {end_date}...")
         
         # Calculate chunk size based on timeframe to stay under 5000 candles
-        # Add buffer for safety (use 4500 instead of 5000)
-        if timeframe_str == '1H':
-            chunk_days = 180  # ~4320 hours in 180 days
-        elif timeframe_str == '4H':
-            chunk_days = 720  # ~4320 4H candles in 720 days
-        elif timeframe_str == '1D':
-            chunk_days = 4000  # Well under 5000 days
-        elif timeframe_str == '15M':
-            chunk_days = 45  # ~4320 15M candles in 45 days
-        else:
-            chunk_days = 365  # Default
+        chunk_days = self._CHUNK_DAYS.get(granularity, 180)
         
         all_candles = []
         current_start = start_date
@@ -182,7 +181,7 @@ class OANDADataCollector:
         
         return df
     
-    def _candles_to_dataframe(self, candles):
+    def _candles_to_dataframe(self, candles, include_incomplete=False):
         """
         Convert OANDA candle format to standard OHLCV DataFrame.
         
@@ -197,8 +196,7 @@ class OANDADataCollector:
         data = []
         
         for candle in candles:
-            # Skip incomplete candles
-            if not candle.get('complete', False):
+            if not include_incomplete and not candle.get('complete', False):
                 continue
             
             mid = candle['mid']
@@ -210,6 +208,7 @@ class OANDADataCollector:
                 'low': float(mid['l']),
                 'close': float(mid['c']),
                 'volume': int(candle['volume']),
+                'complete': candle.get('complete', True),
             })
         
         df = pd.DataFrame(data)
@@ -217,6 +216,41 @@ class OANDADataCollector:
         df = df.sort_index()
         
         return df
+
+    def fetch_recent(self, symbol, timeframe_str, count=500,
+                     include_incomplete=True):
+        """
+        Fetch the N most recent candles — optimised for dashboard use.
+
+        Uses OANDA's 'count' parameter so no date-range chunking is needed.
+
+        Parameters
+        ----------
+        symbol : str, e.g. 'EURUSD'
+        timeframe_str : str, e.g. 'H1', '1H', 'M5'
+        count : int, number of candles (max 5000)
+        include_incomplete : bool, include the currently forming candle
+
+        Returns
+        -------
+        pd.DataFrame with OHLCV data
+        """
+        instrument = self._oanda_instrument_name(symbol)
+        granularity = self._oanda_granularity(timeframe_str)
+
+        params = {
+            'granularity': granularity,
+            'count': min(count, 5000),
+            'price': 'M',
+        }
+
+        request = instruments.InstrumentsCandles(
+            instrument=instrument, params=params)
+        response = self.client.request(request)
+        candles = response.get('candles', [])
+
+        return self._candles_to_dataframe(
+            candles, include_incomplete=include_incomplete)
     
     def collect_all_instruments(self, symbols, timeframes, start_date, end_date, 
                                   output_dir='./data/raw'):
