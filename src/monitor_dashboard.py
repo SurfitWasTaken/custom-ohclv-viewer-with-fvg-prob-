@@ -56,7 +56,7 @@ def _get_predictor():
         return None
 
 def _load_csv(symbol, tf):
-    tf_map = {'H1': '1H', 'H2': '2H', 'H4': '4H', 'D': '1D', 'W': '1W', 'M1': '1M', 'M5': '5M', 'M15': '15M', 'M30': '30M'}
+    tf_map = {'S5': '5S', 'S10': '10S', 'S15': '15S', 'S30': '30S', 'H1': '1H', 'H2': '2H', 'H4': '4H', 'D': '1D', 'W': '1W', 'M1': '1M', 'M5': '5M', 'M15': '15M', 'M30': '30M'}
     file_tf = tf_map.get(tf, tf)
     pattern = os.path.join(DATA_DIR, f'{symbol}_{file_tf}_*.csv')
     files = glob.glob(pattern)

@@ -69,6 +69,10 @@ class OANDADataCollector:
     
     # All OANDA-native granularities we support
     GRANULARITY_MAP = {
+        'S5':  'S5',   '5S':  'S5',
+        'S10': 'S10',  '10S': 'S10',
+        'S15': 'S15',  '15S': 'S15',
+        'S30': 'S30',  '30S': 'S30',
         'M1':  'M1',   '1M':  'M1',
         'M5':  'M5',   '5M':  'M5',
         'M15': 'M15',  '15M': 'M15',
@@ -82,6 +86,7 @@ class OANDADataCollector:
 
     # Max chunk sizes (in days) to stay under 5000-candle OANDA limit
     _CHUNK_DAYS = {
+        'S5': 0.25, 'S10': 0.5, 'S15': 0.75, 'S30': 1.5,
         'M1': 3, 'M5': 15, 'M15': 45, 'M30': 90,
         'H1': 180, 'H2': 360, 'H4': 720,
         'D': 4000, 'W': 4000,
